@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Build outputs and large media files
+# Build outputs
 build_output/
 build_output.zip
-public/Videos/
-*.mp4
