@@ -171,51 +171,74 @@ const Marquee = () => {
   );
 };
 
-const ShortFormCard = ({ project }) => (
-  <div className="relative w-full aspect-[9/16] bg-gradient-to-br from-[#1a1914] via-[#12110e] to-[#2a2512] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center">
-    
-    {/* Premium Animated Placeholder Background */}
-    <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
-      <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 group-hover:text-[#FFD700] transition-colors duration-500">
-        <Play className="w-5 h-5 md:w-6 md:h-6 ml-1" />
-      </div>
-      <p className="text-[9px] md:text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold mt-4">Hover to Play</p>
-    </div>
+const ShortFormCard = ({ project }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const videoRef = useRef(null);
 
-    {/* Video Player */}
-    <video 
-      loop 
-      muted 
-      playsInline
-      preload="none"
-      onMouseEnter={(e) => {
-        // Attempt to play only on hover
-        const playPromise = e.target.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => console.log("Video play interrupted"));
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.target.pause();
-        // Don't reset time so they can resume where they left off, feels more premium!
-      }}
-      className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700 z-10"
+  useEffect(() => {
+    const tryRandomPlay = () => {
+      // 10% chance every few seconds to randomly play this video for a few seconds
+      if (!isHovered && Math.random() < 0.1) {
+        setIsPlaying(true);
+        setTimeout(() => {
+           setIsPlaying(false);
+        }, 3000 + Math.random() * 3000);
+      }
+    };
+    const interval = setInterval(tryRandomPlay, 3000 + Math.random() * 5000);
+    return () => clearInterval(interval);
+  }, [isHovered]);
+
+  useEffect(() => {
+    if (isPlaying || isHovered) {
+      const p = videoRef.current?.play();
+      if (p !== undefined) p.catch(() => {});
+    } else {
+      videoRef.current?.pause();
+    }
+  }, [isPlaying, isHovered]);
+
+  return (
+    <div 
+      className="relative w-full aspect-[9/16] bg-gradient-to-br from-[#1a1914] via-[#12110e] to-[#2a2512] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <source src={project.video} type="video/mp4" />
-    </video>
-
-    {/* Metadata overlay */}
-    <div className="absolute bottom-2 md:bottom-4 left-0 right-0 mx-auto w-[92%] bg-black/70 backdrop-blur-xl border border-white/10 rounded-lg md:rounded-xl p-1.5 md:p-2 flex items-center gap-2 z-20 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-500 overflow-hidden">
-      <div className="w-6 h-6 md:w-8 md:h-8 bg-white/10 rounded-md flex items-center justify-center text-[#FFD700] font-sans font-black text-xs md:text-sm shadow-inner border border-white/5 shrink-0">
-        {project.letter}
+      
+      {/* Premium Animated Placeholder Background */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
+        <div className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 transition-colors duration-500 ${isHovered ? 'text-[#FFD700]' : ''}`}>
+          <Play className="w-5 h-5 md:w-6 md:h-6 ml-1" />
+        </div>
+        <p className="text-[9px] md:text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold mt-4">Hover to Play</p>
       </div>
-      <div className="leading-tight font-sans overflow-hidden flex-1 text-left">
-        <h4 className="text-white font-bold text-[10px] md:text-xs truncate">{project.brand}</h4>
-        <p className="text-gray-400 text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold mt-0.5 truncate">{project.sub}</p>
+
+      {/* Video Player */}
+      <video 
+        ref={videoRef}
+        loop 
+        muted 
+        playsInline
+        preload="metadata"
+        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 z-10 ${isPlaying || isHovered ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <source src={project.video} type="video/mp4" />
+      </video>
+
+      {/* Metadata overlay */}
+      <div className={`absolute bottom-2 md:bottom-4 left-0 right-0 mx-auto w-[92%] bg-black/70 backdrop-blur-xl border border-white/10 rounded-lg md:rounded-xl p-1.5 md:p-2 flex items-center gap-2 z-20 transform transition-transform duration-500 overflow-hidden ${isHovered ? 'translate-y-0' : 'translate-y-1'}`}>
+        <div className="w-6 h-6 md:w-8 md:h-8 bg-white/10 rounded-md flex items-center justify-center text-[#FFD700] font-sans font-black text-xs md:text-sm shadow-inner border border-white/5 shrink-0">
+          {project.letter}
+        </div>
+        <div className="leading-tight font-sans overflow-hidden flex-1 text-left">
+          <h4 className="text-white font-bold text-[10px] md:text-xs truncate">{project.brand}</h4>
+          <p className="text-gray-400 text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold mt-0.5 truncate">{project.sub}</p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Portfolio = () => {
   const [filter, setFilter] = useState('short');
@@ -225,7 +248,7 @@ const Portfolio = () => {
     brand: `Client Project ${i + 1}`,
     sub: "SHORT FORM",
     letter: "C",
-    video: `/Videos/Short/${i + 1}.mp4`
+    video: `https://res.cloudinary.com/ldzwikpf/video/upload/c_scale,w_400,q_auto,f_auto/v1/${i + 1}.mp4`
   }));
   
   // We need exactly 18 videos so the 6 columns have equal heights (3 videos each). 
