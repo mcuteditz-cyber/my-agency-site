@@ -171,32 +171,59 @@ const Marquee = () => {
   );
 };
 
-const ShortFormCard = ({ project }) => (
-  <div className="relative w-full aspect-[9/16] bg-[#181715] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center">
-    
-    {/* Video Player */}
-    <video 
-      autoPlay
-      loop 
-      muted 
-      playsInline
-      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 z-0"
-    >
-      <source src={project.video} type="video/mp4" />
-    </video>
+const ShortFormCard = ({ project }) => {
+  const videoRef = useRef(null);
+  const containerRef = useRef(null);
 
-    {/* Metadata overlay */}
-    <div className="absolute bottom-2 md:bottom-4 left-0 right-0 mx-auto w-[92%] bg-black/70 backdrop-blur-xl border border-white/10 rounded-lg md:rounded-xl p-1.5 md:p-2 flex items-center gap-2 z-20 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-500 overflow-hidden">
-      <div className="w-6 h-6 md:w-8 md:h-8 bg-white/10 rounded-md flex items-center justify-center text-[#FFD700] font-sans font-black text-xs md:text-sm shadow-inner border border-white/5 shrink-0">
-        {project.letter}
-      </div>
-      <div className="leading-tight font-sans overflow-hidden flex-1 text-left">
-        <h4 className="text-white font-bold text-[10px] md:text-xs truncate">{project.brand}</h4>
-        <p className="text-gray-400 text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold mt-0.5 truncate">{project.sub}</p>
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const p = videoRef.current?.play();
+            if (p !== undefined) p.catch(() => {});
+          } else {
+            videoRef.current?.pause();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => {
+      if (containerRef.current) observer.unobserve(containerRef.current);
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative w-full aspect-[9/16] bg-[#181715] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center">
+      
+      {/* Video Player */}
+      <video 
+        ref={videoRef}
+        loop 
+        muted 
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 z-0"
+      >
+        <source src={project.video} type="video/mp4" />
+      </video>
+
+      {/* Metadata overlay */}
+      <div className="absolute bottom-2 md:bottom-4 left-0 right-0 mx-auto w-[92%] bg-black/70 backdrop-blur-xl border border-white/10 rounded-lg md:rounded-xl p-1.5 md:p-2 flex items-center gap-2 z-20 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-500 overflow-hidden">
+        <div className="w-6 h-6 md:w-8 md:h-8 bg-white/10 rounded-md flex items-center justify-center text-[#FFD700] font-sans font-black text-xs md:text-sm shadow-inner border border-white/5 shrink-0">
+          {project.letter}
+        </div>
+        <div className="leading-tight font-sans overflow-hidden flex-1 text-left">
+          <h4 className="text-white font-bold text-[10px] md:text-xs truncate">{project.brand}</h4>
+          <p className="text-gray-400 text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold mt-0.5 truncate">{project.sub}</p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Portfolio = () => {
   const [filter, setFilter] = useState('short');
@@ -206,7 +233,7 @@ const Portfolio = () => {
     brand: `Client Project ${i + 1}`,
     sub: "SHORT FORM",
     letter: "C",
-    video: `https://res.cloudinary.com/ldzwikpf/video/upload/c_scale,w_400,q_auto,f_auto/v1/${i + 1}.mp4`
+    video: `https://res.cloudinary.com/ldzwikpf/video/upload/c_fill,w_400,h_711,g_center,q_auto,f_auto/v1/${i + 1}.mp4`
   }));
   
   // We need exactly 18 videos so the 6 columns have equal heights (3 videos each). 
