@@ -174,10 +174,15 @@ const Marquee = () => {
 const ShortFormCard = ({ project }) => (
   <div className="relative w-full aspect-[9/16] bg-[#181715] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center">
     <video 
-      autoPlay
       loop 
       muted 
       playsInline
+      preload="metadata"
+      onMouseEnter={(e) => e.target.play()}
+      onMouseLeave={(e) => {
+        e.target.pause();
+        e.target.currentTime = 0;
+      }}
       className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 z-0"
     >
       <source src={project.video} type="video/mp4" />
@@ -308,10 +313,15 @@ const Portfolio = () => {
             >
               <div className="w-full aspect-[4/5] md:aspect-[4/3] bg-[#181715] rounded-[2rem] overflow-hidden relative border border-white/5 group-hover:border-[#FFD700]/30 transition-colors duration-500 shadow-2xl shadow-black/50">
                 <video 
-                  autoPlay
                   loop 
                   muted 
                   playsInline 
+                  preload="metadata"
+                  onMouseEnter={(e) => e.target.play()}
+                  onMouseLeave={(e) => {
+                    e.target.pause();
+                    e.target.currentTime = 0;
+                  }}
                   className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700"
                 >
                   <source src={`${project.video}#t=0.001`} type="video/mp4" />
