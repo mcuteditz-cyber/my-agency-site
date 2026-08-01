@@ -172,22 +172,39 @@ const Marquee = () => {
 };
 
 const ShortFormCard = ({ project }) => (
-  <div className="relative w-full aspect-[9/16] bg-[#181715] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center">
+  <div className="relative w-full aspect-[9/16] bg-gradient-to-br from-[#1a1914] via-[#12110e] to-[#2a2512] rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer border border-white/10 hover:border-[#FFD700]/50 transition-all duration-500 shadow-xl flex items-center justify-center">
+    
+    {/* Premium Animated Placeholder Background */}
+    <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
+      <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 group-hover:text-[#FFD700] transition-colors duration-500">
+        <Play className="w-5 h-5 md:w-6 md:h-6 ml-1" />
+      </div>
+      <p className="text-[9px] md:text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold mt-4">Hover to Play</p>
+    </div>
+
+    {/* Video Player */}
     <video 
       loop 
       muted 
       playsInline
-      preload="metadata"
-      onMouseEnter={(e) => e.target.play()}
+      preload="none"
+      onMouseEnter={(e) => {
+        // Attempt to play only on hover
+        const playPromise = e.target.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => console.log("Video play interrupted"));
+        }
+      }}
       onMouseLeave={(e) => {
         e.target.pause();
-        e.target.currentTime = 0;
+        // Don't reset time so they can resume where they left off, feels more premium!
       }}
-      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 z-0"
+      className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700 z-10"
     >
       <source src={project.video} type="video/mp4" />
     </video>
 
+    {/* Metadata overlay */}
     <div className="absolute bottom-2 md:bottom-4 left-0 right-0 mx-auto w-[92%] bg-black/70 backdrop-blur-xl border border-white/10 rounded-lg md:rounded-xl p-1.5 md:p-2 flex items-center gap-2 z-20 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-500 overflow-hidden">
       <div className="w-6 h-6 md:w-8 md:h-8 bg-white/10 rounded-md flex items-center justify-center text-[#FFD700] font-sans font-black text-xs md:text-sm shadow-inner border border-white/5 shrink-0">
         {project.letter}
@@ -311,20 +328,33 @@ const Portfolio = () => {
               key={index} 
               className={`flex flex-col gap-5 group cursor-pointer w-full transition-all duration-700 ease-out hover:-translate-y-2 ${index % 2 === 1 ? 'md:mt-32' : ''}`}
             >
-              <div className="w-full aspect-[4/5] md:aspect-[4/3] bg-[#181715] rounded-[2rem] overflow-hidden relative border border-white/5 group-hover:border-[#FFD700]/30 transition-colors duration-500 shadow-2xl shadow-black/50">
+              <div className="w-full aspect-[4/5] md:aspect-[4/3] bg-gradient-to-br from-[#1a1914] via-[#12110e] to-[#2a2512] rounded-[2rem] overflow-hidden relative border border-white/5 group-hover:border-[#FFD700]/30 transition-colors duration-500 shadow-2xl shadow-black/50">
+                
+                {/* Premium Animated Placeholder Background */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 group-hover:text-[#FFD700] transition-colors duration-500">
+                    <Play className="w-6 h-6 md:w-8 md:h-8 ml-1" />
+                  </div>
+                  <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.2em] font-bold mt-4">Hover to Play</p>
+                </div>
+
                 <video 
                   loop 
                   muted 
                   playsInline 
-                  preload="metadata"
-                  onMouseEnter={(e) => e.target.play()}
+                  preload="none"
+                  onMouseEnter={(e) => {
+                    const playPromise = e.target.play();
+                    if (playPromise !== undefined) {
+                      playPromise.catch(error => console.log("Video play interrupted"));
+                    }
+                  }}
                   onMouseLeave={(e) => {
                     e.target.pause();
-                    e.target.currentTime = 0;
                   }}
-                  className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700"
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700 z-10"
                 >
-                  <source src={`${project.video}#t=0.001`} type="video/mp4" />
+                  <source src={project.video} type="video/mp4" />
                 </video>
               </div>
               
