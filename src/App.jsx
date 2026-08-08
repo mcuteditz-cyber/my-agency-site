@@ -233,7 +233,7 @@ const Portfolio = () => {
     brand: `Client Project ${i + 1}`,
     sub: "SHORT FORM",
     letter: "C",
-    video: `https://res.cloudinary.com/ldzwikpf/video/upload/c_fill,w_400,h_711,g_center,q_auto,f_auto/v1/${i + 1}.mp4`
+    video: `/Videos/Short/${i + 1}.mp4`
   }));
   
   // We need exactly 18 videos so the 6 columns have equal heights (3 videos each). 
